@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS telefones (
     usuario_id INTEGER,
     telefone TEXT NOT NULL,
     principal INTEGER DEFAULT 0,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS emails (
@@ -19,5 +19,5 @@ CREATE TABLE IF NOT EXISTS emails (
     usuario_id INTEGER,
     email TEXT NOT NULL,
     principal INTEGER DEFAULT 0,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );

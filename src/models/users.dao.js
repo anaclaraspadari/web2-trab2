@@ -7,7 +7,7 @@ class usersDAO{
     }
     getById(id){
         const query=db.prepare(`SELECT * FROM usuarios WHERE id=?`)
-        return query.get()
+        return query.get(id)
     }
     createUser(user){
         const query=db.prepare(`INSERT INTO usuarios(cpf, nome, senha, perfil) VALUES (?,?,?,?)`)
