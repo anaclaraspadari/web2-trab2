@@ -1,4 +1,4 @@
-import {db} from "../db/database"
+import {db} from "../db/database.js"
 
 class usersDAO{
     getAll(){
