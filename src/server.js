@@ -1,15 +1,14 @@
 const express = require('express')
 const app=express()
-const path=require('path')
 
 app.get('/', (req, res) => {
     res.send("OI DO SERVIDOR!!!");
 });
 
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', 'src/views');
 
-const usersRouter = require('./routes/users.routes');
+const usersRouter = require('./routes/users-routes');
 app.use(usersRouter);
 
 app.listen(3000, (err) => {
@@ -17,5 +16,5 @@ app.listen(3000, (err) => {
         console.log('Erro ao iniciar o serviço!');
         return;
     }
-    console.log("Service iniciado na porta 3000");
+    console.log("Server iniciado na porta 3000");
 });
