@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Detalhes do Usuário</title>
+  <link rel="stylesheet" href="/styles.css"><!-- se existir -->
+</head>
+<body>
+  <h1>Detalhes do Usuário</h1>
+  <p><strong>ID:</strong> <%= usuario.id %></p>
+  <p><strong>Nome:</strong> <%= usuario.nome %></p>
+  <p><strong>CPF:</strong> <%= usuario.cpf %></p>
+  <p><strong>Perfil:</strong> <%= usuario.perfil %></p>
+
+  <h2>Telefones</h2>
+  <ul>
+    <% telefones.forEach(tel => { %>
+      <li>
+        <%= tel.numero %> <% if (tel.principal) { %><strong>(Principal)</strong><% } %>
+      </li>
+    <% }) %>
+  </ul>
+
+  <h2>Emails</h2>
+  <ul>
+    <% emails.forEach(email => { %>
+      <li>
+        <%= email.endereco %> <% if (email.principal) { %><strong>(Principal)</strong><% } %>
+      </li>
+    <% }) %>
+  </ul>
+
+  <p><a href="/users">Voltar para a lista</a></p>
+</body>
+</html>

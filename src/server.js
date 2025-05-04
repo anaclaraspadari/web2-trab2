@@ -3,11 +3,15 @@ const session = require('express-session');  // Importando o express-session
 const bcrypt = require('bcrypt'); // Para validar a senha
 const db = require('./db/database'); // Acessando a base de dados
 const app = express();
+const userRoutes = require('./routes/user');
 
 // Configurando o Express para usar EJS e JSON
 app.set('view engine', 'ejs');
+const path = require('path');
+app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true })); // Para pegar os dados do formulário
 app.use(express.json()); // Para APIs que recebem JSON
+app.use(userRoutes);
 
 // Configuração da sessão
 app.use(session({

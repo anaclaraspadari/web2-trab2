@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Usuários</title>
+</head>
+<body>
+    <h1>Usuários</h1>
+    <p>Logado como: <%= sessionUser.nome %> (<%= sessionUser.perfil %>)</p>
+    <form method="GET" action="/users">
+        <input type="text" name="filtro" placeholder="Filtrar por nome" value="<%= filtro %>">
+        <button type="submit">Filtrar</button>
+    </form>
+
+    <table border="1">
+        <tr>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Perfil</th>
+            <% if (sessionUser.perfil === 'ADMIN') { %>
+                <th>Ações</th>
+            <% } %>
+        </tr>
+        <% users.forEach(user => { %>
+            <tr>
+                <td><a href="/user/<%= user.id %>"><%= user.nome %></a></td>
+                <td><%= user.cpf %></td>
+                <td><%= user.perfil %></td>
+                <% if (sessionUser.perfil === 'ADMIN') { %>
+                    <td>
+                        <% if (user.perfil !== 'ADMIN' || user.id === sessionUser.id) { %>
+                            <form action="/deleteUser/<%= user.id %>" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este usuário?')">
+                                <button type="submit">Excluir</button>
+                            </form>
+                        <% } else { %>
+                            <!-- Não pode excluir outro ADMIN -->
+                            <em>Não permitido</em>
+                        <% } %>
+                    </td>
+                <% } %>
+            </tr>
+        <% }) %>
+    </table>
+    
+
+    <div>
+        <% if (page > 1) { %>
+            <a href="/users?pagina=<%= page - 1 %>&filtro=<%= filtro %>">Anterior</a>
+        <% } %>
+        Página <%= page %>
+        <% if (hasMore) { %>
+            <a href="/users?pagina=<%= page + 1 %>&filtro=<%= filtro %>">Próxima</a>
+        <% } %>
+    </div>
+
+    <br>
+    <a href="/logout">Sair</a>
+</body>
+</html>
