@@ -3,9 +3,6 @@ const db=require("../db/database")
 console.log("Carregou DAO");
 
 const usersDAO={
-    test(){
-        console.log("Abacate");
-    },
     getAll() {
         console.log("Iniciando a consulta de usuarios: ");
         const query = db.prepare('SELECT * FROM usuarios;');
