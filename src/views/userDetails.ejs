@@ -1,35 +1,22 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Detalhes do Usuário</title>
-  <link rel="stylesheet" href="/styles.css"><!-- se existir -->
+    <meta charset="UTF-8">
+    <title>Detalhes do Usuário</title>
 </head>
 <body>
-  <h1>Detalhes do Usuário</h1>
-  <p><strong>ID:</strong> <%= usuario.id %></p>
-  <p><strong>Nome:</strong> <%= usuario.nome %></p>
-  <p><strong>CPF:</strong> <%= usuario.cpf %></p>
-  <p><strong>Perfil:</strong> <%= usuario.perfil %></p>
+    <h1>Detalhes do Usuário</h1>
+    <p>Nome: <%= user.nome %></p>
+    <p>CPF: <%= user.cpf %></p>
+    <p>Email: <%= user.email %></p>
+    <p>Perfil: <%= user.perfil %></p>
+    
+    <h3>Endereço</h3>
+    <p>Rua: <%= user.endereco %></p>
+    <p>Cidade: <%= user.cidade %></p>
+    <p>Estado: <%= user.estado %></p>
 
-  <h2>Telefones</h2>
-  <ul>
-    <% telefones.forEach(tel => { %>
-      <li>
-        <%= tel.numero %> <% if (tel.principal) { %><strong>(Principal)</strong><% } %>
-      </li>
-    <% }) %>
-  </ul>
-
-  <h2>Emails</h2>
-  <ul>
-    <% emails.forEach(email => { %>
-      <li>
-        <%= email.endereco %> <% if (email.principal) { %><strong>(Principal)</strong><% } %>
-      </li>
-    <% }) %>
-  </ul>
-
-  <p><a href="/users">Voltar para a lista</a></p>
+    <br>
+    <a href="/users">Voltar para a lista de usuários</a>
 </body>
 </html>

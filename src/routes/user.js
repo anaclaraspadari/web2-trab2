@@ -289,6 +289,23 @@ function canEditUser(req, res, next) {
       res.status(500).send('Erro ao excluir usuário.');
     }
   });
+
+  // Rota para exibir detalhes do usuário
+router.get('/user/:id', requireLogin, async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const user = await db.get('SELECT * FROM users WHERE id = ?', [userId]);
+
+        if (!user) {
+            return res.status(404).send('Usuário não encontrado');
+        }
+
+        res.render('userDetails', { user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Erro ao carregar os detalhes do usuário');
+    }
+});
   
 
 module.exports = router;
