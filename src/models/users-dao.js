@@ -24,6 +24,10 @@ const usersDAO={
     deleteUser(id){
         const query=db.prepare(`DELETE FROM usuarios WHERE id=?`)
         return query.run(id)
+    },
+    login(cpf){
+        const query=db.prepare(`SELECT * FROM usuarios WHERE cpf=? LIMIT 1`);
+        return query.get(cpf)
     }
 }
 
