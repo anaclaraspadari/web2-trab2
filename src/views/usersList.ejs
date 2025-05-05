@@ -50,10 +50,10 @@
                                     <a href="/users/<%= user.id %>" class="btn btn-sm btn-primary me-1">
                                         <i class="bi bi-eye"></i> Ver
                                     </a>
-                                    <a href="/users/edit/<%= user.id %>" class="btn btn-sm btn-warning me-1">
+                                    <a href="/updateUser/<%= user.id %>" class="btn btn-sm btn-warning me-1">
                                         <i class="bi bi-pencil"></i> Editar
                                     </a>
-                                    <form action="/users/delete/<%= user.id %>" method="POST" style="display: inline;">
+                                    <form action="/deleteUser/<%= user.id %>" method="POST" style="display: inline;">
                                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir?')">
                                             <i class="bi bi-trash"></i> Excluir
                                         </button>

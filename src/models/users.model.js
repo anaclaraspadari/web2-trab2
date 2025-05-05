@@ -1,3 +1,4 @@
+const usersDAO=require('./users-dao')
 class User{
     constructor(id, nome, cpf, senha, perfil){
         this.id=id;
@@ -7,3 +8,5 @@ class User{
         this.perfil=perfil;
     }
 }
+
+module.exports=User;

@@ -31,7 +31,8 @@ const usersController={
     },
     logout:(req,res)=>{
         req.session.destroy();
-        res.send("LOGOFF CONCLUIDO");
+        res.send("LOGOUT CONCLUIDO");
+        return res.redirect('/login')
     },
     getById: (req,res)=>{
         const id=req.params.id;
@@ -47,6 +48,12 @@ const usersController={
         user.senha=hash(user.senha,10);
         usersDAO.createUser(user);
         res.send("Adicionando Usuário")
+    },
+    showUpdateUser:(req,res)=>{
+        res.render('updateUser');
+    },
+    updateUser:(req,res)=>{
+
     }
 }
 
