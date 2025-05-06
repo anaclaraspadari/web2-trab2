@@ -24,7 +24,11 @@
                     <span class="me-3">Olá, <%= session.user.nome %></span>
                     <a href="/logout" class="btn btn-danger">Sair</a>
                 </div>
-            <% } %>
+            <% } else {%>
+                <div>
+                    <a href="/login" class="btn btn-danger">Login</a>
+                </div>
+            <% }%>
         </div>
 
         <% if (users.length > 0) { %>
@@ -47,7 +51,7 @@
                                 <td><%= user.cpf %></td>
                                 <td><%= user.perfil %></td>
                                 <td class="action-buttons text-center">
-                                    <a href="/users/<%= user.id %>" class="btn btn-sm btn-primary me-1">
+                                    <a href="/user/<%= user.id %>" class="btn btn-sm btn-primary me-1">
                                         <i class="bi bi-eye"></i> Ver
                                     </a>
                                     <a href="/updateUser/<%= user.id %>" class="btn btn-sm btn-warning me-1">

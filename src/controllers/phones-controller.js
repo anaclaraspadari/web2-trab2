@@ -1,0 +1,6 @@
+const usersDAO=require("../models/users-dao")
+const phonesDAO=require("../models/phones-dao")
+const emailsDAO=require("../models/emails-dao")
+const User=require('../models/users-model')
+const Phone=require('../models/phones-model')
+const Email=require('../models/users-model')

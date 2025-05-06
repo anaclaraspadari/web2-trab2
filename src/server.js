@@ -9,7 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'keyboard cat',
+    secret: 'keyboard-cat',
     resave: false,      
     saveUninitialized: true,
 }));

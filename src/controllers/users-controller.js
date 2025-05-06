@@ -1,5 +1,9 @@
-const session = require("express-session");
 const usersDAO=require("../models/users-dao")
+const phonesDAO=require("../models/phones-dao")
+const emailsDAO=require("../models/emails-dao")
+const User=require('../models/users-model')
+const Phone=require('../models/phones-model')
+const Email=require('../models/users-model')
 const { compareSync, hashSync } = require("bcrypt");
 
 const usersController={
@@ -14,7 +18,7 @@ const usersController={
     },
     login: async (req, res) => {
         const { cpf, senha } = req.body;
-        const user = await usersDAO.login(cpf);
+        const user = usersDAO.login(cpf);
         if (!user) {
             return res.render('login', { error: 'Usuário não encontrado', cpf });
         }
@@ -24,6 +28,7 @@ const usersController={
         const senhaValida = compareSync(senha, user.senha);
         if (senhaValida) {
             req.session.user = user;
+            req.session.isAuth = true;
             console.log("USUARIO AUTENTICADO")
             return res.redirect('/users');
         }
@@ -37,7 +42,12 @@ const usersController={
     getById: (req,res)=>{
         const id=req.params.id;
         const user=usersDAO.getById(id);
-        res.json(user)
+        const telefones=phonesDAO.getByUser(id);
+        const emails=emailsDAO.getByUser(id);
+        user.telefones=telefones;
+        user.emails=emails;
+        const usuarioLogado=req.session.user;
+        res.render('userDetails',{user, usuarioLogado, id})
     },
     showCreateUser:(req,res)=>{
         res.render('createUser');
@@ -45,15 +55,55 @@ const usersController={
     createUser: async(req,res)=>{
         console.log({body: req.body})
         const user=req.body;
-        user.senha=hash(user.senha,10);
+        user.senha=hashSync(user.senha,10);
         usersDAO.createUser(user);
         res.send("Adicionando Usuário")
     },
     showUpdateUser:(req,res)=>{
-        res.render('updateUser');
+        const id=req.params.id;
+        const usuarioLogado=req.session.user;
+        req.session.isAuth=true;
+
+        const user=usersDAO.getById(id);
+        if(!user){
+            return res.status(404).send("Usuário não encontrado")
+        }
+        res.render('updateUser',{data:{user, usuarioLogado, id}})
     },
     updateUser:(req,res)=>{
-
+        const id=req.params.id;
+        const usuarioLogado=req.session.user;
+        const antigo=usersDAO.getById(id);
+        req.session.isAuth=true;
+        if(!antigo){
+            return res.status(404).send('Usuário não encontrado');
+        }
+        if(usuarioLogado.perfil!=='ADMIN' && usuarioLogado.id!==parseInt(id)){
+            return res.status(403).send('Permissão negada: você não pode editar esse usuário');
+        }
+        const att=User.instanceRow(req.body);
+        att.id=id;
+        att.cpf=antigo.cpf;
+        att.perfil=antigo.perfil;
+        usersDAO.updateUser(att);
+        return res.redirect('/users')
+    },
+    deleteUser:(req,res)=>{
+        const {id}=req.params;
+        const usuarioLogado=req.session.user;
+        const user=usersDAO.getById(id);
+        req.session.isAuth=true;
+        if(!user){
+            return res.status(404).send('Usuário não encontrado');
+        }
+        if(usuarioLogado.perfil!=='ADMIN'){
+            return res.status(403).send('Permissão negada: você não pode editar esse usuário');
+        }
+        usersDAO.deleteUser(id);
+        if(usuarioLogado.id==id){
+            logout(req,res)
+        }
+        return res.redirect('/users')
     }
 }
 

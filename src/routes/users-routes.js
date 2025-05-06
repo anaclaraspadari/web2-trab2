@@ -7,9 +7,9 @@ const usersRouter = Router();
 usersRouter.get('/users', usersController.getAll);
 usersRouter.get('/createUser',usersController.showCreateUser);
 usersRouter.post('/createUser', usersController.createUser);
-usersRouter.get('updateUser/:id',isAuth, usersController.showUpdateUser)
-// usersRouter.post('/updateUser/:id', isAuth, usersController.update);
-// usersRouter.post('/deleteUser/:id', isAuth, usersController.delete);
+usersRouter.get('/updateUser/:id',isAuth, usersController.showUpdateUser)
+usersRouter.post('/updateUser/:id', isAuth, usersController.updateUser);
+usersRouter.post('/deleteUser/:id', isAuth, usersController.deleteUser);
 usersRouter.get('/user/:id', usersController.getById);
 usersRouter.get('/login',  usersController.showLoginPage);
 usersRouter.post('/login',  usersController.login);

@@ -1,4 +1,5 @@
 const db=require("../db/database")
+const {hashSync}=require('bcrypt')
 
 console.log("Carregou DAO");
 
@@ -19,7 +20,7 @@ const usersDAO={
     },
     updateUser(user){
         const query=db.prepare(`UPDATE usuarios SET nome=?, senha=? WHERE id=?`)
-        return query.run(user.nome, user.senha, user.id)
+        return query.run(user.nome, hashSync(user.senha,10), user.id)
     },
     deleteUser(id){
         const query=db.prepare(`DELETE FROM usuarios WHERE id=?`)
