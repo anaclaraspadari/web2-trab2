@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalhes do Usuário</title>
+</head>
+<body>
+    <h1>Detalhes do Usuário</h1>
+    <p>Nome: <%= user.nome %></p>
+    <p>CPF: <%= user.cpf %></p>
+    <p>Email: <%= user.email %></p>
+    <p>Perfil: <%= user.perfil %></p>
+    
+    <h3>Endereço</h3>
+    <p>Rua: <%= user.endereco %></p>
+    <p>Cidade: <%= user.cidade %></p>
+    <p>Estado: <%= user.estado %></p>
+
+    <br>
+    <a href="/users">Voltar para a lista de usuários</a>
+</body>
+</html>

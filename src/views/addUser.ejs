@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Usuário</title>
+</head>
+<body>
+    <h1>Cadastro de Usuário</h1>
+    <% if (error) { %><p style="color:red;"><%= error %></p><% } %>
+    <form method="POST" action="/addUser">
+        <label>Nome: <input type="text" name="nome" required></label><br>
+        <label>CPF: <input type="text" name="cpf" required></label><br>
+        <label>Senha: <input type="password" name="senha" required></label><br>
+        <button type="submit">Cadastrar</button>
+    </form>
+    <a href="/login">Voltar ao login</a>
+</body>
+</html>

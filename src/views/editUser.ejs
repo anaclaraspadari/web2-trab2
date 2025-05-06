@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Editar Usuário</title>
+</head>
+<body>
+  <h1>Editar Usuário</h1>
+  <form action="/updateUser/<%= user.id %>" method="POST">
+    <label>Nome:</label><br>
+    <input type="text" name="nome" value="<%= user.nome %>" required><br><br>
+
+    <label>Nova Senha (opcional):</label><br>
+    <input type="password" name="senha"><br><br>
+
+    <h3>Telefones:</h3>
+    <div id="telefones">
+      <% telefones.forEach(function(tel, index) { %>
+        <div>
+          <input type="text" name="telefones[<%= index %>][numero]" value="<%= tel.numero %>" required>
+          <label><input type="checkbox" name="telefones[<%= index %>][principal]" <%= tel.principal ? 'checked' : '' %>> Principal</label>
+        </div>
+      <% }) %>
+    </div>
+    <button type="button" onclick="addTelefone()">+ Telefone</button>
+
+    <h3>Emails:</h3>
+    <div id="emails">
+      <% emails.forEach(function(email, index) { %>
+        <div>
+          <input type="email" name="emails[<%= index %>][email]" value="<%= email.email %>" required>
+          <label><input type="checkbox" name="emails[<%= index %>][principal]" <%= email.principal ? 'checked' : '' %>> Principal</label>
+        </div>
+      <% }) %>
+    </div>
+    <button type="button" onclick="addEmail()">+ Email</button>
+
+    <br><br>
+    <button type="submit">Salvar Alterações</button>
+  </form>
+
+  <script>
+    function addTelefone() {
+      const container = document.getElementById('telefones');
+      const index = container.children.length;
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <input type="text" name="telefones[${index}][numero]" required>
+        <label><input type="checkbox" name="telefones[${index}][principal]"> Principal</label>
+      `;
+      container.appendChild(div);
+    }
+
+    function addEmail() {
+      const container = document.getElementById('emails');
+      const index = container.children.length;
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <input type="email" name="emails[${index}][email]" required>
+        <label><input type="checkbox" name="emails[${index}][principal]"> Principal</label>
+      `;
+      container.appendChild(div);
+    }
+  </script>
+</body>
+</html>
