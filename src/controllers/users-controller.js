@@ -61,7 +61,6 @@ const usersController={
         console.log(usuarioId)
         const novoPhone=phonesDAO.createPhone(usuarioId.id, user.phonePrincipal, 1)
         const novoEmail=emailsDAO.createEmail(usuarioId.id, user.emailPrincipal, 1)
-        res.send("Adicionando Usuário")
         return res.redirect('/users')
     },
     showUpdateUser:(req,res)=>{
