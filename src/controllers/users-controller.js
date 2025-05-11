@@ -53,11 +53,16 @@ const usersController={
         res.render('createUser');
     },
     createUser: async(req,res)=>{
-        console.log({body: req.body})
         const user=req.body;
+        console.log(user.phonePrincipal)
         user.senha=hashSync(user.senha,10);
         usersDAO.createUser(user);
+        let usuarioId=usersDAO.getByCPF(user.cpf)
+        console.log(usuarioId)
+        const novoPhone=phonesDAO.createPhone(usuarioId.id, user.phonePrincipal, 1)
+        const novoEmail=emailsDAO.createEmail(usuarioId.id, user.emailPrincipal, 1)
         res.send("Adicionando Usuário")
+        return res.redirect('/users')
     },
     showUpdateUser:(req,res)=>{
         const id=req.params.id;

@@ -17,9 +17,9 @@ const emailsDAO={
         const query=db.prepare(`SELECT * FROM emails WHERE usuario_id=? and principal=1`)
         return query.get(usuario_id)
     },
-    createEmail(email){
+    createEmail(userId, email, princ){
         const query=db.prepare(`INSERT INTO emails(usuario_id,email,principal) VALUES (?,?,?)`)
-        return query.run(email.usuario_id, email.email, email.principal)
+        return query.run(userId, email, princ)
     },
     updateEmail(usuario_id,email){
         const query=db.prepare(`UPDATE emails SET email=?, principal=?  WHERE usuario_id=?`)

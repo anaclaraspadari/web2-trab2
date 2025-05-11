@@ -14,6 +14,10 @@ const usersDAO={
         const query=db.prepare(`SELECT * FROM usuarios WHERE id=?`)
         return query.get(id)
     },
+    getByCPF(cpf){
+        const query=db.prepare(`SELECT id FROM usuarios WHERE cpf=?`)
+        return query.get(cpf)
+    },
     createUser(user){
         const query=db.prepare(`INSERT INTO usuarios(cpf, nome, senha, perfil) VALUES (?,?,?,?)`)
         return query.run(user.cpf, user.nome, user.senha, user.perfil)

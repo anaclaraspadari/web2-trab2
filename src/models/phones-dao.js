@@ -17,9 +17,9 @@ const phonesDAO={
         const query=db.prepare(`SELECT * FROM telefones WHERE usuario_id=? and principal=1`)
         return query.get(usuario_id)
     },
-    createPhone(phone){
+    createPhone(userId, phone, princ){
         const query=db.prepare(`INSERT INTO telefones(usuario_id,telefone,principal) VALUES (?,?,?)`)
-        return query.run(phone.usuario_id, phone.telefone, phone.principal)
+        return query.run(userId, phone, princ)
     },
     updatePhone(usuario_id,phone){
         const query=db.prepare(`UPDATE telefones SET telefone=?, principal=?  WHERE usuario_id=?`)
