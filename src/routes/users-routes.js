@@ -16,5 +16,7 @@ usersRouter.post('/login',  usersController.login);
 usersRouter.get('/logout',  usersController.logout);
 usersRouter.get('/user/:id/createEmail', usersController.showCreateEmail)
 usersRouter.get('/user/:id/createPhone', usersController.showCreatePhone)
+usersRouter.post('/user/:id/createEmail', usersController.createEmail)
+//usersRouter.get('/createPhone', usersController.createPhone)
 
 module.exports = usersRouter;

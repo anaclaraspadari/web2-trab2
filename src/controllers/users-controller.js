@@ -54,11 +54,9 @@ const usersController={
     },
     createUser: async(req,res)=>{
         const user=req.body;
-        console.log(user.phonePrincipal)
         user.senha=hashSync(user.senha,10);
         usersDAO.createUser(user);
         let usuarioId=usersDAO.getByCPF(user.cpf)
-        console.log(usuarioId)
         const novoPhone=phonesDAO.createPhone(usuarioId.id, user.phonePrincipal, 1)
         const novoEmail=emailsDAO.createEmail(usuarioId.id, user.emailPrincipal, 1)
         return res.redirect('/users')
@@ -68,7 +66,22 @@ const usersController={
         res.render('createEmail',{id})
     },
     createEmail: async(req,res)=>{
-        
+        try {
+            const userId = req.params.id;
+            const user = usersDAO.getById(userId);
+            const email = req.body;
+            const isPrincipal = parseInt(email.principal) === 1;
+            const existingPrincipal = emailsDAO.getEmailPrincipal(user.id);
+            emailsDAO.createEmail(user.id, email.email, isPrincipal);
+            if (isPrincipal && existingPrincipal) {
+                emailsDAO.updateEmail(existingPrincipal.id, { principal: 0 });
+            }
+            return res.redirect(`/user/${userId}`);
+            
+        } catch (error) {
+            console.error('Error creating email:', error);
+            return res.redirect(`/user/${req.params.id}?error=Failed to add email`);
+        }
     },
     showCreatePhone:(req,res)=>{
         const id=req.params.id;
