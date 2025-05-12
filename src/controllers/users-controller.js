@@ -50,8 +50,7 @@ const usersController={
         res.render('userDetails',{user, usuarioLogado, id})
     },
     showCreateUser:(req,res)=>{
-        const id=req.params.id;
-        res.render('createUser',{id});
+        res.render('createUser');
     },
     createUser: async(req,res)=>{
         const user=req.body;
@@ -65,10 +64,15 @@ const usersController={
         return res.redirect('/users')
     },
     showCreateEmail:(req,res)=>{
-        res.render('createEmail')
+        const id=req.params.id;
+        res.render('createEmail',{id})
+    },
+    createEmail: async(req,res)=>{
+        
     },
     showCreatePhone:(req,res)=>{
-        res.render('createPhone')
+        const id=req.params.id;
+        res.render('createPhone',{id})
     },
     showUpdateUser:(req,res)=>{
         const id=req.params.id;
