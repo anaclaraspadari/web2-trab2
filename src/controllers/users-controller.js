@@ -87,6 +87,24 @@ const usersController={
         const id=req.params.id;
         res.render('createPhone',{id})
     },
+    createPhone: async(req,res)=>{
+        try {
+            const userId = req.params.id;
+            const user = usersDAO.getById(userId);
+            const phone = req.body;
+            const isPrincipal = parseInt(phone.principal) === 1;
+            const existingPrincipal = phonesDAO.getPhonePrincipal(user.id);
+            phonesDAO.createPhone(user.id, phone.telefone, isPrincipal);
+            if (isPrincipal && existingPrincipal) {
+                phonesDAO.updatePhone(existingPrincipal.id, { principal: 0 });
+            }
+            return res.redirect(`/user/${userId}`);
+            
+        } catch (error) {
+            console.error('Error creating phone:', error);
+            return res.redirect(`/user/${req.params.id}?error=Failed to add phone`);
+        }
+    },
     showUpdateUser:(req,res)=>{
         const id=req.params.id;
         const usuarioLogado=req.session.user;
