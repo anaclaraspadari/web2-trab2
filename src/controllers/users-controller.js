@@ -50,7 +50,8 @@ const usersController={
         res.render('userDetails',{user, usuarioLogado, id})
     },
     showCreateUser:(req,res)=>{
-        res.render('createUser');
+        const id=req.params.id;
+        res.render('createUser',{id});
     },
     createUser: async(req,res)=>{
         const user=req.body;
@@ -62,6 +63,12 @@ const usersController={
         const novoPhone=phonesDAO.createPhone(usuarioId.id, user.phonePrincipal, 1)
         const novoEmail=emailsDAO.createEmail(usuarioId.id, user.emailPrincipal, 1)
         return res.redirect('/users')
+    },
+    showCreateEmail:(req,res)=>{
+        res.render('createEmail')
+    },
+    showCreatePhone:(req,res)=>{
+        res.render('createPhone')
     },
     showUpdateUser:(req,res)=>{
         const id=req.params.id;

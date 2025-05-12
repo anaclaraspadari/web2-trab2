@@ -14,5 +14,7 @@ usersRouter.get('/user/:id', usersController.getById);
 usersRouter.get('/login',  usersController.showLoginPage);
 usersRouter.post('/login',  usersController.login);
 usersRouter.get('/logout',  usersController.logout);
+usersRouter.get('/createEmail', usersController.showCreateEmail)
+usersRouter.get('/createPhone', usersController.showCreatePhone)
 
 module.exports = usersRouter;

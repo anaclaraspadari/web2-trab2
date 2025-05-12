@@ -1,0 +1,29 @@
+<!-- views/login.ejs -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novo E-mail</title>
+</head>
+<body>
+  <div class="cadastro-container">
+    <h2>Cadastro de E-mails</h2>
+    <form action="/createEmail" method="POST">
+      <div class="input-group">
+        <label for="email">E-mail:</label>
+        <input type="text" id="email" name="email" required>
+      </div>
+      <br>
+      <label for="isPrincipal">Principal:</label>
+      <div class="input-group" name="isPrincipal">
+        <label for="principal">Sim</label>
+        <input type="radio" name="principal" id="principalSim">
+        <label for="principal">Não</label>
+        <input type="radio" name="principal" id="principalNao" checked>
+      </div>
+      <button type="submit">Cadastrar</button>
+    </form>
+  </div>
+</body>
+</html>
