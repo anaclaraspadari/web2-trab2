@@ -134,6 +134,36 @@ const usersController={
         usersDAO.updateUser(att);
         return res.redirect('/users')
     },
+    showUpdateEmail:(req,res)=>{
+        const id=req.params.id;
+        const id2=req.params.id2;
+        const usuarioLogado=req.session.user;
+        req.session.isAuth=true;
+        const user=usersDAO.getById(id);
+        const email=emailsDAO.getById(id2)
+        if(!email){
+            return res.status(404).send('E-mail não encontrado');
+        }
+        res.render('updateEmail',user, email, usuarioLogado, id, id2)
+    },
+    showUpdatePhone:(req,res)=>{
+        const id=req.params.id;
+        const id2=req.params.id2;
+        const usuarioLogado=req.session.user;
+        req.session.isAuth=true;
+        const user=usersDAO.getById(id);
+        const phone=phonesDAO.getById(id2)
+        if(!phone){
+            return res.status(404).send('Telefone não encontrado');
+        }
+        res.render('updatePhone',user, phone, usuarioLogado, id,id2)
+    },
+    updateEmail:(req,res)=>{
+
+    },
+    updatePhone:(req,res)=>{
+
+    },
     deleteUser:(req,res)=>{
         const {id}=req.params;
         const usuarioLogado=req.session.user;

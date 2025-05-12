@@ -18,5 +18,7 @@ usersRouter.get('/user/:id/createEmail', usersController.showCreateEmail)
 usersRouter.get('/user/:id/createPhone', usersController.showCreatePhone)
 usersRouter.post('/user/:id/createEmail', usersController.createEmail)
 usersRouter.post('/user/:id/createPhone', usersController.createPhone)
+usersRouter.get('/user/:id/updateEmail/:id2', isAuth, usersController.showUpdateEmail)
+usersRouter.get('/user/:id/updatePhone/:id2', isAuth, usersController.showUpdatePhone)
 
 module.exports = usersRouter;
