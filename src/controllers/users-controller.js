@@ -144,7 +144,12 @@ const usersController={
         if(!email){
             return res.status(404).send('E-mail não encontrado');
         }
-        res.render('updateEmail',user, email, usuarioLogado, id, id2)
+        res.render('updateEmail', { 
+        email: email,
+        usuarioLogado: usuarioLogado,
+        id: id,
+        id2: id2
+    });
     },
     showUpdatePhone:(req,res)=>{
         const id=req.params.id;
@@ -156,7 +161,7 @@ const usersController={
         if(!phone){
             return res.status(404).send('Telefone não encontrado');
         }
-        res.render('updatePhone',user, phone, usuarioLogado, id,id2)
+        res.render('updatePhone', phone, usuarioLogado, id,id2)
     },
     updateEmail:(req,res)=>{
 
