@@ -21,13 +21,17 @@ const emailsDAO={
         const query=db.prepare(`INSERT INTO emails(usuario_id,email,principal) VALUES (?,?,?)`)
         return query.run(userId, email, princ)
     },
-    updateEmail(usuario_id,email){
-        const query=db.prepare(`UPDATE emails SET email=?, principal=?  WHERE usuario_id=?`)
-        return query.run(email.email, email.principal, usuario_id)
+    updateEmail(email){
+        const query=db.prepare(`UPDATE emails SET email=?, principal=COALESCE(?, 0) WHERE id=? AND usuario_id=?`)
+        return query.run(email.email, email.principal, email.id, email.usuario_id)
     },
     deleteEmail(id){
         const query=db.prepare(`DELETE FROM emails WHERE id=?`);
         return query.run(id)
+    },
+    setAllNonPrincipalExcept(usuario_id, exceptEmailId){
+        const query=db.prepare('UPDATE emails SET principal=0 WHERE usuario_id=? AND id!=? AND principal=1');
+        return query.run(usuario_id, exceptEmailId)
     }
 }
 

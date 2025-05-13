@@ -158,11 +158,59 @@ const usersController={
         }
         res.render('updatePhone', { phone: phone,usuarioLogado: usuarioLogado,id: id,id2: id2})
     },
-    updateEmail:(req,res)=>{
+    updateEmail: (req, res) => {
+        const id = req.params.id;
+        const id2 = req.params.id2;
+        const usuarioLogado = req.session.user;
+        
+        if (usuarioLogado.perfil !== 'ADMIN' && usuarioLogado.id !== parseInt(id)) {
+            return res.status(403).send('Permissão negada');
+        }
+        const emailAtual = emailsDAO.getById(id2);
+        if (!emailAtual) {
+            return res.status(404).send('E-mail não encontrado');
+        }
+        const novoEmail = req.body.email || emailAtual.email;
+        const isPrincipal = req.body.principal === '1' ? 1 : 0;
+        const dadosAtualizacao = {
+            id: id2,
+            email: novoEmail,
+            principal: isPrincipal,
+            usuario_id: id
+        };
+        if (isPrincipal === 1) {
+            emailsDAO.setAllNonPrincipalExcept(id, id2);
+        }
+        emailsDAO.updateEmail(dadosAtualizacao);
 
+        return res.redirect(`/user/${id}`);
     },
     updatePhone:(req,res)=>{
+        const id = req.params.id;
+        const id2 = req.params.id2;
+        const usuarioLogado = req.session.user;
+        
+        if (usuarioLogado.perfil !== 'ADMIN' && usuarioLogado.id !== parseInt(id)) {
+            return res.status(403).send('Permissão negada');
+        }
+        const phoneAtual = phonesDAO.getById(id2);
+        if (!phoneAtual) {
+            return res.status(404).send('E-mail não encontrado');
+        }
+        const novoPhone = req.body.phone || phoneAtual.telefone;
+        const isPrincipal = req.body.principal === '1' ? 1 : 0;
+        const dadosAtualizacao = {
+            id: id2,
+            telefone: novoPhone,
+            principal: isPrincipal,
+            usuario_id: id
+        };
+        if (isPrincipal === 1) {
+            phonesDAO.setAllNonPrincipalExcept(id, id2);
+        }
+        phonesDAO.updateEmail(dadosAtualizacao);
 
+        return res.redirect(`/user/${id}`);
     },
     deleteUser:(req,res)=>{
         const {id}=req.params;
