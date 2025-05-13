@@ -213,7 +213,7 @@ const usersController={
         return res.redirect(`/user/${id}`);
     },
     deleteUser:(req,res)=>{
-        const {id}=req.params;
+        const id=req.params;
         const usuarioLogado=req.session.user;
         const user=usersDAO.getById(id);
         req.session.isAuth=true;
@@ -228,6 +228,21 @@ const usersController={
             logout(req,res)
         }
         return res.redirect('/users')
+    },
+    deleteEmail:(req,res)=>{
+        const id=req.params.id;
+        const id2=req.params.id2;
+        const usuarioLogado=req.session.user;
+        const emailAtual = emailsDAO.getById(id2);
+        if (!emailAtual) {
+            return res.status(404).send('E-mail não encontrado');
+        }
+        if (usuarioLogado.id !== parseInt(id)) {
+            return res.status(403).send('Permissão negada');
+        }
+    },
+    deletePhone:(req,res)=>{
+        
     }
 }
 
