@@ -5,6 +5,7 @@ const User=require('../models/users-model')
 const Phone=require('../models/phones-model')
 const Email=require('../models/users-model')
 const { compareSync, hashSync } = require("bcrypt");
+const db=require("../db/database");
 
 const usersController={
     getAll: (req,res) => {
@@ -240,9 +241,20 @@ const usersController={
         if (usuarioLogado.id !== parseInt(id)) {
             return res.status(403).send('Permissão negada');
         }
+        let qtdEmails=emailsDAO.countEmails(id);
+        if(qtdEmails<=1){
+            return res.status(403).send('Permissão negada: esta conta possui apenas 1 e-mail');
+        }
+        emailsDAO.deleteEmail(emailAtual.id);
+        if(emailAtual.principal==1){
+            let ultimaInserçao=db.prepare('SELECT last_inserted_rowid() FROM emails').get();
+            console.log(ultimaInserçao)
+            emailsDAO.setPrincipal(ultimaInserçao.id);
+        }
+        return res.redirect(`/user/${id}`);
     },
     deletePhone:(req,res)=>{
-        
+
     }
 }
 

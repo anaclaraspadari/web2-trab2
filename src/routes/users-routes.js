@@ -22,5 +22,6 @@ usersRouter.get('/user/:id/updateEmail/:id2', isAuth, usersController.showUpdate
 usersRouter.get('/user/:id/updatePhone/:id2', isAuth, usersController.showUpdatePhone)
 usersRouter.post('/user/:id/updateEmail/:id2', isAuth, usersController.updateEmail)
 usersRouter.post('/user/:id/updatePhone/:id2', isAuth, usersController.updatePhone)
+usersRouter.post('/user/:id/deleteEmail/:id2', isAuth, usersController.deleteEmail)
 
 module.exports = usersRouter;
