@@ -252,6 +252,7 @@ const usersController={
         const id = req.params.id;
         const id2 = req.params.id2;
         const usuarioLogado = req.session.user;
+        const isAuth=true;
         const emailAtual = emailsDAO.getById(id2);
         if (!emailAtual) {
             return res.status(404).send('E-mail não encontrado');
@@ -278,6 +279,7 @@ const usersController={
         const id = req.params.id;
         const id2 = req.params.id2;
         const usuarioLogado = req.session.user;
+        const isAuth=true;
         const phoneAtual = phonesDAO.getById(id2);
         if (!phoneAtual) {
             return res.status(404).send('Telefone não encontrado');
@@ -295,7 +297,7 @@ const usersController={
             if (novoPrincipal) {
                 phonesDAO.setPrincipal(novoPrincipal.id);
             } else {
-                console.log('Nenhum outro e-mail encontrado para definir como principal.');
+                console.log('Nenhum outro telefone encontrado para definir como principal.');
             }
         }
         return res.redirect(`/user/${id}`);
