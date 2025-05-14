@@ -14,10 +14,10 @@ usersRouter.get('/user/:id', usersController.getById);
 usersRouter.get('/login',  usersController.showLoginPage);
 usersRouter.post('/login',  usersController.login);
 usersRouter.get('/logout',  usersController.logout);
-usersRouter.get('/user/:id/createEmail', usersController.showCreateEmail)
-usersRouter.get('/user/:id/createPhone', usersController.showCreatePhone)
-usersRouter.post('/user/:id/createEmail', usersController.createEmail)
-usersRouter.post('/user/:id/createPhone', usersController.createPhone)
+usersRouter.get('/user/:id/createEmail', isAuth, usersController.showCreateEmail)
+usersRouter.get('/user/:id/createPhone', isAuth, usersController.showCreatePhone)
+usersRouter.post('/user/:id/createEmail', isAuth, usersController.createEmail)
+usersRouter.post('/user/:id/createPhone', isAuth, usersController.createPhone)
 usersRouter.get('/user/:id/updateEmail/:id2', isAuth, usersController.showUpdateEmail)
 usersRouter.get('/user/:id/updatePhone/:id2', isAuth, usersController.showUpdatePhone)
 usersRouter.post('/user/:id/updateEmail/:id2', isAuth, usersController.updateEmail)

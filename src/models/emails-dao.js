@@ -19,7 +19,7 @@ const emailsDAO={
     },
     createEmail(userId, email, princ){
         const query=db.prepare(`INSERT INTO emails(usuario_id,email,principal) VALUES (?,?,?)`)
-        return query.run(userId, email, princ)
+        return query.run(userId, email, princ ? 1 : 0)
     },
     updateEmail(email){
         const query=db.prepare(`UPDATE emails SET email=?, principal=COALESCE(?, 0) WHERE id=? AND usuario_id=?`)

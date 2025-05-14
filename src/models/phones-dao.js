@@ -28,6 +28,14 @@ const phonesDAO={
     deletePhone(id){
         const query=db.prepare(`DELETE FROM telefones WHERE id=?`);
         return query.run(id)
+    },
+    countPhones(usuario_id){
+        const query=db.prepare('SELECT count(*) FROM telefones WHERE usuario_id=?');
+        return query.get(usuario_id)
+    },
+    setPrincipal(id){
+        const query=db.prepare('UPDATE telefones SET principal=1 WHERE id=?')
+        return query.run(id)
     }
 }
 

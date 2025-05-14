@@ -63,16 +63,27 @@ const usersController={
         return res.redirect('/users')
     },
     showCreateEmail:(req,res)=>{
+        const usuarioLogado=req.session.user;
+        req.session.isAuth=true;
         const id=req.params.id;
-        res.render('createEmail',{id})
+        res.render('createEmail',{data:{usuarioLogado, id}})
     },
     createEmail: async(req,res)=>{
         try {
+            const usuarioLogado=req.session.user;
+            req.session.isAuth=true;
+            if(usuarioLogado.perfil!=='ADMIN' && usuarioLogado.id!==parseInt(id)){
+                return res.status(403).send('Permissão negada: você não pode inserir dados para este usuário');
+            }
             const userId = req.params.id;
             const user = usersDAO.getById(userId);
             const email = req.body;
             const isPrincipal = parseInt(email.principal) === 1;
             const existingPrincipal = emailsDAO.getEmailPrincipal(user.id);
+            console.log('Creating email for user:', userId);
+            console.log('Email data:', email);
+            console.log('Is principal:', isPrincipal);
+            console.log('Existing principal email:', existingPrincipal);
             emailsDAO.createEmail(user.id, email.email, isPrincipal);
             if (isPrincipal && existingPrincipal) {
                 emailsDAO.updateEmail(existingPrincipal.id, { principal: 0 });
@@ -86,10 +97,17 @@ const usersController={
     },
     showCreatePhone:(req,res)=>{
         const id=req.params.id;
-        res.render('createPhone',{id})
+        const usuarioLogado=req.session.user;
+        req.session.isAuth=true;
+        res.render('createPhone',{data:{usuarioLogado, id}})
     },
     createPhone: async(req,res)=>{
         try {
+            const usuarioLogado=req.session.user;
+            req.session.isAuth=true;
+            if(usuarioLogado.perfil!=='ADMIN' && usuarioLogado.id!==parseInt(id)){
+                return res.status(403).send('Permissão negada: você não pode inserir dados para este usuário');
+            }
             const userId = req.params.id;
             const user = usersDAO.getById(userId);
             const phone = req.body;
@@ -163,7 +181,7 @@ const usersController={
         const id = req.params.id;
         const id2 = req.params.id2;
         const usuarioLogado = req.session.user;
-        
+        req.session.isAuth=true;
         if (usuarioLogado.perfil !== 'ADMIN' && usuarioLogado.id !== parseInt(id)) {
             return res.status(403).send('Permissão negada');
         }
@@ -190,7 +208,7 @@ const usersController={
         const id = req.params.id;
         const id2 = req.params.id2;
         const usuarioLogado = req.session.user;
-        
+        req.session.isAuth=true;
         if (usuarioLogado.perfil !== 'ADMIN' && usuarioLogado.id !== parseInt(id)) {
             return res.status(403).send('Permissão negada');
         }
@@ -230,10 +248,10 @@ const usersController={
         }
         return res.redirect('/users')
     },
-    deleteEmail:(req,res)=>{
-        const id=req.params.id;
-        const id2=req.params.id2;
-        const usuarioLogado=req.session.user;
+    deleteEmail: (req, res) => {
+        const id = req.params.id;
+        const id2 = req.params.id2;
+        const usuarioLogado = req.session.user;
         const emailAtual = emailsDAO.getById(id2);
         if (!emailAtual) {
             return res.status(404).send('E-mail não encontrado');
@@ -241,20 +259,46 @@ const usersController={
         if (usuarioLogado.id !== parseInt(id)) {
             return res.status(403).send('Permissão negada');
         }
-        let qtdEmails=emailsDAO.countEmails(id);
-        if(qtdEmails<=1){
+        let qtdEmails = emailsDAO.countEmails(id);
+        if (qtdEmails <= 1) {
             return res.status(403).send('Permissão negada: esta conta possui apenas 1 e-mail');
         }
         emailsDAO.deleteEmail(emailAtual.id);
-        if(emailAtual.principal==1){
-            let ultimaInserçao=db.prepare('SELECT last_inserted_rowid() FROM emails').get();
-            console.log(ultimaInserçao)
-            emailsDAO.setPrincipal(ultimaInserçao.id);
+        if (emailAtual.principal == 1) {
+            const novoPrincipal = db.prepare('SELECT id FROM emails WHERE usuario_id = ? AND principal = 0 LIMIT 1').get(id);            
+            if (novoPrincipal) {
+                emailsDAO.setPrincipal(novoPrincipal.id);
+            } else {
+                console.log('Nenhum outro e-mail encontrado para definir como principal.');
+            }
         }
         return res.redirect(`/user/${id}`);
     },
     deletePhone:(req,res)=>{
-
+        const id = req.params.id;
+        const id2 = req.params.id2;
+        const usuarioLogado = req.session.user;
+        const phoneAtual = phonesDAO.getById(id2);
+        if (!phoneAtual) {
+            return res.status(404).send('Telefone não encontrado');
+        }
+        if (usuarioLogado.id !== parseInt(id)) {
+            return res.status(403).send('Permissão negada');
+        }
+        let qtdPhones = phonesDAO.countPhones(id);
+        if (qtdPhones <= 1) {
+            return res.status(403).send('Permissão negada: esta conta possui apenas 1 telefone');
+        }
+        phonesDAO.deletePhone(phoneAtual.id);
+        if (phoneAtual.principal == 1) {
+            const novoPrincipal = db.prepare('SELECT id FROM telefones WHERE usuario_id = ? AND principal = 0 LIMIT 1').get(id);            
+            if (novoPrincipal) {
+                phonesDAO.setPrincipal(novoPrincipal.id);
+            } else {
+                console.log('Nenhum outro e-mail encontrado para definir como principal.');
+            }
+        }
+        return res.redirect(`/user/${id}`);
     }
 }
 
