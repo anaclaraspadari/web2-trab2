@@ -18,22 +18,27 @@ const usersController={
         res.render('login');
     },
     login: async (req, res) => {
-        const { cpf, senha } = req.body;
-        const user = usersDAO.login(cpf);
-        if (!user) {
-            return res.render('login', { error: 'Usuário não encontrado', cpf });
+        try{
+            const { cpf, senha } = req.body;
+            const user = usersDAO.login(cpf);
+            if (!user) {
+                return res.render('login', { error: 'Usuário não encontrado', cpf });
+            }
+            if (user.senha === null) {
+                return res.render('login', { error: 'Conta não ativada ou sem senha definida', cpf });
+            }
+            const senhaValida = compareSync(senha, user.senha);
+            if (senhaValida) {
+                req.session.user = user;
+                req.session.isAuth = true;
+                console.log("USUARIO AUTENTICADO")
+                return res.redirect('/users');
+            }
+            return res.render('login', { error: 'Senha incorreta', cpf });
+        }catch (error) {
+            console.error('Error login:', error);
+            return res.redirect(`/user/${req.params.id}?error=Failed login`);
         }
-        if (user.senha === null) {
-            return res.render('login', { error: 'Conta não ativada ou sem senha definida', cpf });
-        }
-        const senhaValida = compareSync(senha, user.senha);
-        if (senhaValida) {
-            req.session.user = user;
-            req.session.isAuth = true;
-            console.log("USUARIO AUTENTICADO")
-            return res.redirect('/users');
-        }
-        return res.render('login', { error: 'Senha incorreta', cpf });
     },
     logout:(req,res)=>{
         req.session.destroy();
@@ -41,26 +46,36 @@ const usersController={
         return res.redirect('/login')
     },
     getById: (req,res)=>{
-        const id=req.params.id;
-        const user=usersDAO.getById(id);
-        const telefones=phonesDAO.getByUser(id);
-        const emails=emailsDAO.getByUser(id);
-        user.telefones=telefones;
-        user.emails=emails;
-        const usuarioLogado=req.session.user;
-        res.render('userDetails',{user, usuarioLogado, id})
+        try{
+            const id=req.params.id;
+            const user=usersDAO.getById(id);
+            const telefones=phonesDAO.getByUser(id);
+            const emails=emailsDAO.getByUser(id);
+            user.telefones=telefones;
+            user.emails=emails;
+            const usuarioLogado=req.session.user;
+            res.render('userDetails',{user, usuarioLogado, id})
+        }catch (error) {
+            console.error('Error searching for user:', error);
+            return res.redirect(`/user/${req.params.id}?error=Failed to get user`);
+        }
     },
     showCreateUser:(req,res)=>{
         res.render('createUser');
     },
     createUser: async(req,res)=>{
-        const user=req.body;
-        user.senha=hashSync(user.senha,10);
-        usersDAO.createUser(user);
-        let usuarioId=usersDAO.getByCPF(user.cpf)
-        const novoPhone=phonesDAO.createPhone(usuarioId.id, user.phonePrincipal, 1)
-        const novoEmail=emailsDAO.createEmail(usuarioId.id, user.emailPrincipal, 1)
-        return res.redirect('/users')
+        try{
+            const user=req.body;
+            user.senha=hashSync(user.senha,10);
+            usersDAO.createUser(user);
+            let usuarioId=usersDAO.getByCPF(user.cpf)
+            const novoPhone=phonesDAO.createPhone(usuarioId.id, user.phonePrincipal, 1)
+            const novoEmail=emailsDAO.createEmail(usuarioId.id, user.emailPrincipal, 1)
+            return res.redirect('/users')
+        }catch (error) {
+            console.error('Error creating user:', error);
+            return res.redirect(`/user/${req.params.id}?error=Failed to add user`);
+        }
     },
     showCreateEmail:(req,res)=>{
         const usuarioLogado=req.session.user;
@@ -136,22 +151,27 @@ const usersController={
         res.render('updateUser',{data:{user, usuarioLogado, id}})
     },
     updateUser:(req,res)=>{
-        const id=req.params.id;
-        const usuarioLogado=req.session.user;
-        const antigo=usersDAO.getById(id);
-        req.session.isAuth=true;
-        if(!antigo){
-            return res.status(404).send('Usuário não encontrado');
+        try{
+            const id=req.params.id;
+            const usuarioLogado=req.session.user;
+            const antigo=usersDAO.getById(id);
+            req.session.isAuth=true;
+            if(!antigo){
+                return res.status(404).send('Usuário não encontrado');
+            }
+            if(usuarioLogado.perfil!=='ADMIN' && usuarioLogado.id!==parseInt(id)){
+                return res.status(403).send('Permissão negada: você não pode editar esse usuário');
+            }
+            const att=User.instanceRow(req.body);
+            att.id=id;
+            att.cpf=antigo.cpf;
+            att.perfil=antigo.perfil;
+            usersDAO.updateUser(att);
+            return res.redirect('/users')
+        }catch (error) {
+            console.error('Error updating user:', error);
+            return res.redirect(`/user/${req.params.id}?error=Failed to update user`);
         }
-        if(usuarioLogado.perfil!=='ADMIN' && usuarioLogado.id!==parseInt(id)){
-            return res.status(403).send('Permissão negada: você não pode editar esse usuário');
-        }
-        const att=User.instanceRow(req.body);
-        att.id=id;
-        att.cpf=antigo.cpf;
-        att.perfil=antigo.perfil;
-        usersDAO.updateUser(att);
-        return res.redirect('/users')
     },
     showUpdateEmail:(req,res)=>{
         const id=req.params.id;
@@ -178,129 +198,154 @@ const usersController={
         res.render('updatePhone', { phone: phone,usuarioLogado: usuarioLogado,id: id,id2: id2})
     },
     updateEmail: (req, res) => {
-        const id = req.params.id;
-        const id2 = req.params.id2;
-        const usuarioLogado = req.session.user;
-        req.session.isAuth=true;
-        if (usuarioLogado.perfil !== 'ADMIN' && usuarioLogado.id !== parseInt(id)) {
-            return res.status(403).send('Permissão negada');
-        }
-        const emailAtual = emailsDAO.getById(id2);
-        if (!emailAtual) {
-            return res.status(404).send('E-mail não encontrado');
-        }
-        const novoEmail = req.body.email || emailAtual.email;
-        const isPrincipal = req.body.principal === '1' ? 1 : 0;
-        const dadosAtualizacao = {
-            id: id2,
-            email: novoEmail,
-            principal: isPrincipal,
-            usuario_id: id
-        };
-        if (isPrincipal === 1) {
-            emailsDAO.setAllNonPrincipalExcept(id, id2);
-        }
-        emailsDAO.updateEmail(dadosAtualizacao);
+        try{
+            const id = req.params.id;
+            const id2 = req.params.id2;
+            const usuarioLogado = req.session.user;
+            req.session.isAuth=true;
+            if (usuarioLogado.perfil !== 'ADMIN' && usuarioLogado.id !== parseInt(id)) {
+                return res.status(403).send('Permissão negada');
+            }
+            const emailAtual = emailsDAO.getById(id2);
+            if (!emailAtual) {
+                return res.status(404).send('E-mail não encontrado');
+            }
+            const novoEmail = req.body.email || emailAtual.email;
+            const isPrincipal = req.body.principal === '1' ? 1 : 0;
+            const dadosAtualizacao = {
+                id: id2,
+                email: novoEmail,
+                principal: isPrincipal,
+                usuario_id: id
+            };
+            if (isPrincipal === 1) {
+                emailsDAO.setAllNonPrincipalExcept(id, id2);
+            }
+            emailsDAO.updateEmail(dadosAtualizacao);
 
-        return res.redirect(`/user/${id}`);
+            return res.redirect(`/user/${id}`);
+        }catch (error) {
+            console.error('Error updating email:', error);
+            return res.redirect(`/user/${req.params.id}?error=Failed to update email`);
+        }
     },
     updatePhone:(req,res)=>{
-        const id = req.params.id;
-        const id2 = req.params.id2;
-        const usuarioLogado = req.session.user;
-        req.session.isAuth=true;
-        if (usuarioLogado.perfil !== 'ADMIN' && usuarioLogado.id !== parseInt(id)) {
-            return res.status(403).send('Permissão negada');
-        }
-        const phoneAtual = phonesDAO.getById(id2);
-        if (!phoneAtual) {
-            return res.status(404).send('E-mail não encontrado');
-        }
-        const novoPhone = req.body.phone || phoneAtual.telefone;
-        const isPrincipal = req.body.principal === '1' ? 1 : 0;
-        const dadosAtualizacao = {
-            id: id2,
-            telefone: novoPhone,
-            principal: isPrincipal,
-            usuario_id: id
-        };
-        if (isPrincipal === 1) {
-            phonesDAO.setAllNonPrincipalExcept(id, id2);
-        }
-        phonesDAO.updateEmail(dadosAtualizacao);
+        try{
+            const id = req.params.id;
+            const id2 = req.params.id2;
+            const usuarioLogado = req.session.user;
+            req.session.isAuth=true;
+            if (usuarioLogado.perfil !== 'ADMIN' && usuarioLogado.id !== parseInt(id)) {
+                return res.status(403).send('Permissão negada');
+            }
+            const phoneAtual = phonesDAO.getById(id2);
+            if (!phoneAtual) {
+                return res.status(404).send('E-mail não encontrado');
+            }
+            const novoPhone = req.body.phone || phoneAtual.telefone;
+            const isPrincipal = req.body.principal === '1' ? 1 : 0;
+            const dadosAtualizacao = {
+                id: id2,
+                telefone: novoPhone,
+                principal: isPrincipal,
+                usuario_id: id
+            };
+            if (isPrincipal === 1) {
+                phonesDAO.setAllNonPrincipalExcept(id, id2);
+            }
+            phonesDAO.updateEmail(dadosAtualizacao);
 
-        return res.redirect(`/user/${id}`);
+            return res.redirect(`/user/${id}`);
+        }catch (error) {
+            console.error('Error updating phone:', error);
+            return res.redirect(`/user/${req.params.id}?error=Failed to update phone`);
+        }
     },
     deleteUser:(req,res)=>{
-        const id=req.params;
-        const usuarioLogado=req.session.user;
-        const user=usersDAO.getById(id);
-        req.session.isAuth=true;
-        if(!user){
-            return res.status(404).send('Usuário não encontrado');
-        }
-        if(usuarioLogado.perfil!=='ADMIN'){
-            return res.status(403).send('Permissão negada: você não pode editar esse usuário');
-        }
-        usersDAO.deleteUser(id);
-        if(usuarioLogado.id==id){
-            logout(req,res)
-        }
-        return res.redirect('/users')
+        try{
+            const id=req.params;
+            const usuarioLogado=req.session.user;
+            const user=usersDAO.getById(id);
+            req.session.isAuth=true;
+            if(!user){
+                return res.status(404).send('Usuário não encontrado');
+            }
+            if(usuarioLogado.perfil!=='ADMIN'){
+                return res.status(403).send('Permissão negada: você não pode editar esse usuário');
+            }
+            usersDAO.deleteUser(id);
+            if(usuarioLogado.id==id){
+                logout(req,res)
+            }
+            return res.redirect('/users')
+        }catch (error) {
+            console.error('Error deleting user:', error);
+            return res.redirect(`/user/${req.params.id}?error=Failed to delete user`);
+        }    
     },
     deleteEmail: (req, res) => {
-        const id = req.params.id;
-        const id2 = req.params.id2;
-        const usuarioLogado = req.session.user;
-        const isAuth=true;
-        const emailAtual = emailsDAO.getById(id2);
-        if (!emailAtual) {
-            return res.status(404).send('E-mail não encontrado');
-        }
-        if (usuarioLogado.id !== parseInt(id)) {
-            return res.status(403).send('Permissão negada');
-        }
-        let qtdEmails = emailsDAO.countEmails(id);
-        if (qtdEmails <= 1) {
-            return res.status(403).send('Permissão negada: esta conta possui apenas 1 e-mail');
-        }
-        emailsDAO.deleteEmail(emailAtual.id);
-        if (emailAtual.principal == 1) {
-            const novoPrincipal = db.prepare('SELECT id FROM emails WHERE usuario_id = ? AND principal = 0 LIMIT 1').get(id);            
-            if (novoPrincipal) {
-                emailsDAO.setPrincipal(novoPrincipal.id);
-            } else {
-                console.log('Nenhum outro e-mail encontrado para definir como principal.');
+        try{
+            const id = req.params.id;
+            const id2 = req.params.id2;
+            const usuarioLogado = req.session.user;
+            const isAuth=true;
+            const emailAtual = emailsDAO.getById(id2);
+            if (!emailAtual) {
+                return res.status(404).send('E-mail não encontrado');
             }
+            if (usuarioLogado.id !== parseInt(id)) {
+                return res.status(403).send('Permissão negada');
+            }
+            let qtdEmails = emailsDAO.countEmails(id);
+            if (qtdEmails <= 1) {
+                return res.status(403).send('Permissão negada: esta conta possui apenas 1 e-mail');
+            }
+            emailsDAO.deleteEmail(emailAtual.id);
+            if (emailAtual.principal == 1) {
+                const novoPrincipal = db.prepare('SELECT id FROM emails WHERE usuario_id = ? AND principal = 0 LIMIT 1').get(id);            
+                if (novoPrincipal) {
+                    emailsDAO.setPrincipal(novoPrincipal.id);
+                } else {
+                    console.log('Nenhum outro e-mail encontrado para definir como principal.');
+                }
+            }
+            return res.redirect(`/user/${id}`);
+        }catch (error) {
+            console.error('Error deleting email:', error);
+            return res.redirect(`/user/${req.params.id}?error=Failed to delete email`);
         }
-        return res.redirect(`/user/${id}`);
     },
     deletePhone:(req,res)=>{
-        const id = req.params.id;
-        const id2 = req.params.id2;
-        const usuarioLogado = req.session.user;
-        const isAuth=true;
-        const phoneAtual = phonesDAO.getById(id2);
-        if (!phoneAtual) {
-            return res.status(404).send('Telefone não encontrado');
-        }
-        if (usuarioLogado.id !== parseInt(id)) {
-            return res.status(403).send('Permissão negada');
-        }
-        let qtdPhones = phonesDAO.countPhones(id);
-        if (qtdPhones <= 1) {
-            return res.status(403).send('Permissão negada: esta conta possui apenas 1 telefone');
-        }
-        phonesDAO.deletePhone(phoneAtual.id);
-        if (phoneAtual.principal == 1) {
-            const novoPrincipal = db.prepare('SELECT id FROM telefones WHERE usuario_id = ? AND principal = 0 LIMIT 1').get(id);            
-            if (novoPrincipal) {
-                phonesDAO.setPrincipal(novoPrincipal.id);
-            } else {
-                console.log('Nenhum outro telefone encontrado para definir como principal.');
+        try{
+            const id = req.params.id;
+            const id2 = req.params.id2;
+            const usuarioLogado = req.session.user;
+            const isAuth=true;
+            const phoneAtual = phonesDAO.getById(id2);
+            if (!phoneAtual) {
+                return res.status(404).send('Telefone não encontrado');
             }
+            if (usuarioLogado.id !== parseInt(id)) {
+                return res.status(403).send('Permissão negada');
+            }
+            let qtdPhones = phonesDAO.countPhones(id);
+            if (qtdPhones <= 1) {
+                return res.status(403).send('Permissão negada: esta conta possui apenas 1 telefone');
+            }
+            phonesDAO.deletePhone(phoneAtual.id);
+            if (phoneAtual.principal == 1) {
+                const novoPrincipal = db.prepare('SELECT id FROM telefones WHERE usuario_id = ? AND principal = 0 LIMIT 1').get(id);            
+                if (novoPrincipal) {
+                    phonesDAO.setPrincipal(novoPrincipal.id);
+                } else {
+                    console.log('Nenhum outro telefone encontrado para definir como principal.');
+                }
+            }
+            return res.redirect(`/user/${id}`);
+        }catch (error) {
+            console.error('Error deleting phone:', error);
+            return res.redirect(`/user/${req.params.id}?error=Failed to delete phone`);
         }
-        return res.redirect(`/user/${id}`);
     }
 }
 

@@ -9,6 +9,19 @@
 </head>
 <body>
     <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="my-4">Lista de Usuários</h1>
+            <% if (usuarioLogado) { %>
+                <div>
+                    <span class="me-3">Olá, <%= usuarioLogado.nome %></span>
+                    <a href="/logout" class="btn btn-danger">Sair</a>
+                </div>
+            <% } else {%>
+                <div>
+                    <a href="/login" class="btn btn-danger">Login</a>
+                </div>
+            <% }%>
+        </div>
         <div class="card mb-4">
             <div class="card-header bg-primary text-white">
                 <h2 class="h4 mb-0">Informações do Usuário</h2>
