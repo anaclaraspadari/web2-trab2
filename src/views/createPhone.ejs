@@ -23,7 +23,7 @@
   <div class="container">
     <div class="cadastro-container">
       <h2 class="text-center mb-4">Cadastro de Telefones</h2>
-      <form action="/createEmail" method="POST">
+      <form action="/user/<%= data.id %>/createPhone" method="POST">
         <div class="mb-3">
           <label for="telefone" class="form-label">Telefone:</label>
           <input type="telefone" class="form-control" id="telefone" name="telefone" required>
